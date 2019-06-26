@@ -6,56 +6,81 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Document</title>
-
     <script>
-        var i = 0;
-        class AppDrawer extends HTMLElement {
+        class MyWebComponent extends HTMLElement {
             constructor() {
                 super();
-            }
-            static get observedAttributes() {
-                return ['disabled'];
-            }
-            attributeChangedCallback(attrName, oldVal, newVal) {
-                console.log(++i);
-                console.log("attrName: " + attrName);
-                console.log("oldVal: " + oldVal);
-                console.log("newVal: " + newVal);
+                this.attachShadow({ mode: "open" });
+                this.text = 'custom element shadow dom';
+                this.text = 'as;ldkfja;lskdfja;lskdjfa;lskdjf';
             }
             connectedCallback() {
-                this.setAttribute('disabled', false);
-                this.setAttribute('disabled', true);
-            }
-            get disabled() {
-                return this.hasAttribute('disabled');
-            }
+                const theme = this.closest('[data-theme]').dataset.theme;
 
-            set disabled(val) {
-                // Reflect the value of `disabled` as an attribute.
-                if (val) {
-                    this.setAttribute('disabled', val);
-                } else {
-                    this.removeAttribute('disabled');
-                }
+                this.shadowRoot.innerHTML = `
+                    <style>
+                        p {
+                            text-transform: UPPERCASE;
+                        }
+                        p.dark {
+                            background-color: black;
+                            color: white;
+                        }
+                    </style>
+                    <p class="${theme}">${this.text}</p>
+                    <slot></slot>
+                `;
+                let assignedNodes = this.shadowRoot.querySelector("slot").assignedNodes();
+                console.log(assignedNodes);
+                this.shadowRoot.querySelector("slot").addEventListener("slotchange", () => {
+                    assignedNodes = this.shadowRoot.querySelector("slot").assignedNodes();
+                    console.log(assignedNodes); 
+                });
+                var targetNode = this;
+                var config = { attributes: true, childList: true, subtree: true };
+                var callback = function(mutations) {
+                    mutations.forEach(function(mutation) {
+                        console.log(mutation);
+                    });
+                };
+                var observer = new MutationObserver(callback);
+                observer.observe(targetNode, config);
             }
         }
-        window.customElements.define('app-drawer', AppDrawer);
+
+        window.customElements.define("my-web-component", MyWebComponent);
+
     </script>
-    <style type="text/css">
-        app-drawer {
-            font-size: 30px;
+    <style>
+        span {
+            color: blue;
         }
     </style>
 </head>
 
-<body>
-    hello world
-    <app-drawer disabled="disabled">hello world</app-drawer>
+<body style="color:green;" data-theme="light">
+    <div><span>native element span</span></div>
+    <div id="shadow">
+        <div><span>slot span</span></div>
+    </div>
+    <my-web-component>hi dad</my-web-component>
     <script>
-        var x = document.getElementsByTagName("app-drawer")[0];
-        x.addEventListener("click", function (event) {
-            console.log('clicked');
-        });
+        var shadow = document.getElementById("shadow").attachShadow({ mode: 'open' });
+        // console.log(shadow.querySelector("slot"));
+        shadow.innerHTML = '<slot></slot><span>span inside native div</span>';
+        // console.log(shadow.querySelector("slot"));
+        var style = document.createElement('style');
+        style.textContent = `
+        html span {
+            color:blue;
+        }
+        :host {
+            all: initial;
+        }
+        span {
+            color:red;
+        }`;
+        shadow.appendChild(style);
     </script>
 </body>
 

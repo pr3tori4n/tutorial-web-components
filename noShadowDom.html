@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <script>
+        var i = 0;
+        class AppDrawer extends HTMLElement {
+            constructor() {
+                super();
+            }
+            static get observedAttributes() {
+                return ['disabled'];
+            }
+            attributeChangedCallback(attrName, oldVal, newVal) {
+                console.log(++i);
+                console.log("attrName: " + attrName);
+                console.log("oldVal: " + oldVal);
+                console.log("newVal: " + newVal);
+            }
+            connectedCallback() {
+                this.setAttribute('disabled', false);
+                this.setAttribute('disabled', true);
+            }
+            get disabled() {
+                return this.hasAttribute('disabled');
+            }
+
+            set disabled(val) {
+                // Reflect the value of `disabled` as an attribute.
+                if (val) {
+                    this.setAttribute('disabled', val);
+                } else {
+                    this.removeAttribute('disabled');
+                }
+            }
+        }
+        window.customElements.define('app-drawer', AppDrawer);
+    </script>
+    <style type="text/css">
+        app-drawer {
+            font-size: 30px;
+        }
+    </style>
+</head>
+
+<body>
+    hello world
+    <app-drawer disabled="disabled">hello world</app-drawer>
+    <script>
+        var x = document.getElementsByTagName("app-drawer")[0];
+        x.addEventListener("click", function (event) {
+            console.log('clicked');
+        });
+    </script>
+</body>
+
+</html>
