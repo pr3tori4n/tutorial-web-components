@@ -60,12 +60,18 @@
 <body data-theme="light">
     <my-web-component>hi dad</my-web-component>
     <button onClick="addOne();">Add Child to my-web-component</button>
+    <button onClick="removeLast();">Remove Last Child from my-web-component</button>
     <script>
         function addOne() {
             const wc = document.querySelector("my-web-component");
             const par = document.createElement("p");
             par.innerText = "par text";
             wc.appendChild(par);
+        }
+        function removeLast() {
+            const wc = document.querySelector("my-web-component");
+            const lastChild = wc.querySelector(":last-child");
+            wc.removeChild(lastChild);
         }
     </script>
 </body>
