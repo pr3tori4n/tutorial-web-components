@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script type="text/javascript" src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2.10/webcomponents-loader.js"></script>
+    <style>
+        span {
+            color: blue;
+        }
+    </style>
+</head>
+
+<body style="color:green;" data-theme="light">
+    <div><span>not shadow dom</span></div>
+    <hr />
+    <div id="attachShadowHere">
+        <div><span>light dom</span></div>
+    </div>
+    <script>
+        var shadow = document.getElementById("attachShadowHere").attachShadow({ mode: 'open' });
+        shadow.innerHTML = '<slot></slot><span>shadow dom</span>';
+        var style = document.createElement('style');
+        style.textContent = `
+        :host {
+            all: initial;
+        }
+        span {
+            color:red;
+        }`;
+        shadow.appendChild(style);
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script type="text/javascript" src="https://unpkg.com/@webcomponents/webcomponentsjs@2.2.10/webcomponents-loader.js"></script>
+    <script>
+        WebComponents.waitFor(() => {
+            class MyWebComponent extends HTMLElement {
+                constructor() {
+                    super();
+                    this.attachShadow({ mode: "open" });
+                    this.text = 'custom element shadow dom';
+                    this.text = 'as;ldkfja;lskdfja;lskdjfa;lskdjf';
+                }
+                connectedCallback() {
+                    const theme = this.closest('[data-theme]').dataset.theme;
+
+                    this.shadowRoot.innerHTML = `
+                        <style>
+                            p {
+                                text-transform: UPPERCASE;
+                            }
+                            p.dark {
+                                background-color: black;
+                                color: white;
+                            }
+                        </style>
+                        <slot></slot>
+                        <p class="${theme}">${this.text}</p>
+                    `;
+                    let assignedNodes = this.shadowRoot.querySelector("slot").assignedNodes();
+                    console.log(assignedNodes);
+                    this.shadowRoot.querySelector("slot").addEventListener("slotchange", () => {
+                        assignedNodes = this.shadowRoot.querySelector("slot").assignedNodes();
+                        console.log(assignedNodes); 
+                    });
+                    var targetNode = this;
+                    var config = { attributes: true, childList: true, subtree: true };
+                    var callback = function(mutations) {
+                        mutations.forEach(function(mutation) {
+                            console.log(mutation);
+                        });
+                    };
+                    var observer = new MutationObserver(callback);
+                    observer.observe(targetNode, config);
+                }
+            }
+
+            window.customElements.define("my-web-component", MyWebComponent);
+        });
+    </script>
+</head>
+
+<body style="color:green;" data-theme="light">
+    <my-web-component>hi dad</my-web-component>
+</body>
+
+</html>
